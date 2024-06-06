@@ -1,30 +1,40 @@
 package com.example.vkclient.ui.theme
 
 import android.util.Log
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.firstcomposeproject.ui.theme.MainViewModel
 import com.example.firstcomposeproject.ui.theme.NavigationItem
-import com.example.vkclient.domain.FeedPost
 
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
-fun MainScreen() {
-
-    val feedPost = remember {
-        mutableStateOf(FeedPost())
-    }
+fun MainScreen(
+    viewModel: MainViewModel
+) {
     Scaffold(
         bottomBar = {
             BottomNavigation {
@@ -56,22 +66,52 @@ fun MainScreen() {
             }
         }
     ) {
-        PostCard(
-            modifier = Modifier.padding(8.dp).size(800.dp),
-            feedPost = feedPost.value,
-            onStatisticsClickListener = { newItem ->
-                val oldStatistics = feedPost.value.statistics
-                val newStatistics = oldStatistics.toMutableList().apply {
-                    replaceAll { oldItem ->
-                        if (oldItem.type == newItem.type) {
-                            oldItem.copy(count = oldItem.count + 1)
-                        } else {
-                            oldItem
-                        }
-                    }
+
+        val feedPosts = viewModel.feedPosts.observeAsState(listOf())
+
+
+        LazyColumn(
+            contentPadding = PaddingValues(
+                top = 12.dp,
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 72.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            items(
+                items = feedPosts.value,
+                key = { it.id }) { feedPost ->
+                val dismissState = rememberDismissState()
+                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                    viewModel.remove(feedPost)
                 }
-                feedPost.value = feedPost.value.copy(statistics = newStatistics)
+                SwipeToDismiss(
+                    modifier = Modifier.animateItemPlacement(),
+                    state = dismissState,
+                    background = {},
+                    directions = setOf(androidx.compose.material3.DismissDirection.EndToStart),
+                    dismissContent = {
+                        PostCard(
+                            feedPost = feedPost,
+                            onViewsClickListener = { statisticItem ->
+                                viewModel.updateCount(feedPost, statisticItem)
+                            },
+                            onLikeClickListener = { statisticItem ->
+                                viewModel.updateCount(feedPost, statisticItem)
+                            },
+                            onShareClickListener = { statisticItem ->
+                                viewModel.updateCount(feedPost, statisticItem)
+                            },
+                            onCommentClickListener = { statisticItem ->
+                                viewModel.updateCount(feedPost, statisticItem)
+                            },
+                        )
+                    })
+
             }
-        )
+        }
+
     }
 }
