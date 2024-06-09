@@ -34,7 +34,10 @@ import com.example.vkclient.domain.StatisticType
 fun PostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onStatisticsClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -47,7 +50,9 @@ fun PostCard(
             Text(text = feedPost.contentText)
             Spacer(modifier = Modifier.height(8.dp))
             Image(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
                 painter = painterResource(id = feedPost.contentImageResId),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
@@ -55,9 +60,10 @@ fun PostCard(
             Spacer(modifier = Modifier.height(8.dp))
             Statistics(
                 statistics = feedPost.statistics,
-                onItemClickListener = {
-                    onStatisticsClickListener(it)
-                })
+                onLikeClickListener = onLikeClickListener,
+                onShareClickListener = onShareClickListener,
+                onViewsClickListener = onViewsClickListener,
+                onCommentClickListener = onCommentClickListener)
         }
     }
 }
@@ -102,7 +108,10 @@ private fun PostHeader(
 @Composable
 private fun Statistics(
     statistics: List<StatisticItem>,
-    onItemClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
 ) {
     Row {
         Row(
@@ -113,7 +122,7 @@ private fun Statistics(
                 iconResId = R.drawable.ic_views_count,
                 text = viewsItem.count.toString(),
                 onItemClickListener = {
-                    onItemClickListener(viewsItem)
+                    onViewsClickListener(viewsItem)
                 })
         }
         Row(
@@ -125,7 +134,7 @@ private fun Statistics(
                 iconResId = R.drawable.ic_share,
                 text = sharesItem.count.toString(),
                 onItemClickListener = {
-                    onItemClickListener(sharesItem)
+                    onShareClickListener(sharesItem)
                 })
 
             val commentsItem = statistics.getItemByType(StatisticType.COMMENTS)
@@ -133,7 +142,7 @@ private fun Statistics(
                 iconResId = R.drawable.ic_comment,
                 text = commentsItem.count.toString(),
                 onItemClickListener = {
-                    onItemClickListener(commentsItem)
+                    onCommentClickListener(commentsItem)
                 })
 
             val likesItem = statistics.getItemByType(StatisticType.LIKES)
@@ -141,14 +150,14 @@ private fun Statistics(
                 iconResId = R.drawable.ic_like,
                 text = likesItem.count.toString(),
                 onItemClickListener = {
-                    onItemClickListener(likesItem)
+                    onLikeClickListener(likesItem)
                 })
         }
     }
 }
 
-private fun List<StatisticItem>.getItemByType(statisticType: StatisticType): StatisticItem{
-    return this.find {it.type == statisticType} ?: throw RuntimeException("")
+private fun List<StatisticItem>.getItemByType(statisticType: StatisticType): StatisticItem {
+    return this.find { it.type == statisticType } ?: throw RuntimeException("")
 }
 
 @Composable
@@ -161,7 +170,7 @@ private fun IconWithText(
         modifier = Modifier
             .clickable {
                 onItemClickListener()
-        },
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

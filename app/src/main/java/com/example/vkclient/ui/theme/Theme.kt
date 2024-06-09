@@ -20,7 +20,7 @@ private val DarkColorScheme = darkColorScheme(
     primary = Color.Black,
     secondary = Color.Black,
     onPrimary = Color.White,
-    onSecondary = Color.Black
+    onSecondary = Color.Black,
 )
 
 
