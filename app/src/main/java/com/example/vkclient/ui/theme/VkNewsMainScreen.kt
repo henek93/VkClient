@@ -7,6 +7,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,20 +16,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.firstcomposeproject.ui.theme.MainViewModel
 import com.example.firstcomposeproject.ui.theme.NavigationItem
+import com.example.vkclient.domain.FeedPost
 import com.example.vkclient.navigation.AppNavGraph
-import com.example.vkclient.navigation.NavigationState
+import com.example.vkclient.navigation.Screen
 import com.example.vkclient.navigation.rememberNavigationState
 
 
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel
-) {
+fun MainScreen() {
     val navigationState = rememberNavigationState()
+
     Scaffold(
         bottomBar = {
             BottomNavigation(
@@ -43,10 +43,15 @@ fun MainScreen(
                     NavigationItem.Profile
                 )
                 items.forEach { item ->
+                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } ?: false
                     BottomNavigationItem(
-                        selected = currentRout == item.screen.route,
+                        selected = selected,
                         onClick = {
-                            navigationState.navigateTo(item.screen.route)
+                            if (!selected) {
+                                navigationState.navigateTo(item.screen.route)
+                            }
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -63,10 +68,20 @@ fun MainScreen(
     ) { paddingValues ->
         AppNavGraph(
             navHostController = navigationState.navHostController,
-            homeScreenContent = {
+            newFeedScreenContent = {
                 HomeScreen(
-                    viewModel = viewModel,
-                    paddingValues = paddingValues
+                    paddingValues = paddingValues,
+                    onCommentClickListener = {
+                        navigationState.navigateToComments(it)
+                    }
+                )
+            },
+            commentsScreenContent = {feedPost ->
+                CommentScreen(
+                    feedPost = feedPost,
+                    onBackPressed = {
+                        navigationState.navHostController.popBackStack()
+                    }
                 )
             },
             favouriteScreenContent = { TextCounter(name = "Favourite") },
