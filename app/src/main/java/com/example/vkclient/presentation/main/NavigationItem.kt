@@ -1,4 +1,4 @@
-package com.example.firstcomposeproject.ui.theme
+package com.example.vkclient.presentation.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite

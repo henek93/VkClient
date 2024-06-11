@@ -1,4 +1,4 @@
-package com.example.vkclient.ui.theme
+package com.example.vkclient.presentation.main
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.BottomNavigation
@@ -7,10 +7,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -18,11 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.firstcomposeproject.ui.theme.NavigationItem
-import com.example.vkclient.domain.FeedPost
 import com.example.vkclient.navigation.AppNavGraph
-import com.example.vkclient.navigation.Screen
 import com.example.vkclient.navigation.rememberNavigationState
+import com.example.vkclient.presentation.comments.CommentScreen
+import com.example.vkclient.presentation.news.NewsFeedScreen
 
 
 @Composable
@@ -69,7 +66,7 @@ fun MainScreen() {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             newFeedScreenContent = {
-                HomeScreen(
+                NewsFeedScreen(
                     paddingValues = paddingValues,
                     onCommentClickListener = {
                         navigationState.navigateToComments(it)
