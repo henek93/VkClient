@@ -1,4 +1,4 @@
-package com.example.vkclient.ui.theme
+package com.example.vkclient.presentation.comments
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,8 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.vkclient.CommentsViewModel
-import com.example.vkclient.CommentsViewModelFactory
 import com.example.vkclient.domain.FeedPost
 import com.example.vkclient.domain.PostComment
 
