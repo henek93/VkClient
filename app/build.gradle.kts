@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -74,7 +75,7 @@ dependencies {
     val nav_version = "2.7.7"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.material:material:1.6.8")
 
     implementation("com.google.code.gson:gson:2.10.1")
 
@@ -83,4 +84,22 @@ dependencies {
     //vk api
     implementation("com.vk:android-sdk-core:4.1.0")
     implementation("com.vk:android-sdk-api:4.1.0")
+
+
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation("io.coil-kt:coil-compose:2.1.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.vk:android-sdk-core:4.1.0")
+    implementation("com.vk:android-sdk-api:4.1.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.dagger:dagger:2.48.1")
+    kapt("com.google.dagger:dagger-compiler:2.48.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 }

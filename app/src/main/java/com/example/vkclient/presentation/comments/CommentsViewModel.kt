@@ -1,30 +1,21 @@
 package com.example.vkclient.presentation.comments
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.vkclient.domain.FeedPost
-import com.example.vkclient.domain.PostComment
+import com.example.vkclient.domain.entity.FeedPost
+import com.example.vkclient.domain.usecases.GetCommentsUseCase
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CommentsViewModel(feedPost: FeedPost) : ViewModel() {
+class CommentsViewModel @Inject constructor(
+    private val feedPost: FeedPost,
+    private val getCommentsUseCase: GetCommentsUseCase
+) : ViewModel() {
 
-    private val _screenState = MutableLiveData<CommentScreenState>(CommentScreenState.Initial)
-    val screenState: LiveData<CommentScreenState> = _screenState
-
-
-    init {
-        loadComments(FeedPost())
-    }
-
-    fun loadComments(feedPost: FeedPost) {
-        val comments = mutableListOf<PostComment>().apply {
-            repeat(10) {
-                add(PostComment(id = it))
-            }
+    val screenState = getCommentsUseCase(feedPost)
+        .map {
+            CommentsScreenState.Comments(
+                feedPost = feedPost,
+                comments = it
+            )
         }
-        _screenState.value = CommentScreenState.Comments(
-            feedPost = feedPost,
-            comments = comments
-        )
-    }
 }

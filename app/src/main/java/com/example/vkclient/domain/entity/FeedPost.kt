@@ -1,32 +1,30 @@
-package com.example.vkclient.domain
+package com.example.vkclient.domain.entity
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import androidx.navigation.NavType
-import androidx.versionedparcelable.ParcelField
-import com.example.vkclient.R
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
+@Immutable
 @Parcelize
 data class FeedPost(
-    val id: Int = 0,
-    val communityName: String = "/dev/null",
-    val publicDate: String = "14:00",
-    val avatarResId: Int = R.drawable.post_comunity_thumbnail,
-    val contentText: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    val contentImageResId: Int = R.drawable.post_content_image,
-    val statistics: List<StatisticItem> = listOf(
-        StatisticItem(type = StatisticType.VIEWS, 996),
-        StatisticItem(type = StatisticType.SHARES, 7),
-        StatisticItem(type = StatisticType.COMMENTS, 8),
-        StatisticItem(type = StatisticType.LIKES, 27),
-    )
+    val id: Long,
+    val communityId: Long,
+    val communityName: String,
+    val publicationDate: String,
+    val communityImageUrl: String,
+    val contentText: String,
+    val contentImageUrl: String?,
+    val statistics: List<StatisticItem>,
+    val isLiked: Boolean
 ) : Parcelable {
 
     companion object {
+
         val NavigationType: NavType<FeedPost> = object : NavType<FeedPost>(false) {
+
             override fun get(bundle: Bundle, key: String): FeedPost? {
                 return bundle.getParcelable(key)
             }
@@ -38,7 +36,6 @@ data class FeedPost(
             override fun put(bundle: Bundle, key: String, value: FeedPost) {
                 bundle.putParcelable(key, value)
             }
-
         }
     }
 }

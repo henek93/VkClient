@@ -3,9 +3,10 @@ package com.example.vkclient.presentation.main
 import androidx.compose.foundation.clickable
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,9 +19,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vkclient.navigation.AppNavGraph
 import com.example.vkclient.navigation.rememberNavigationState
-import com.example.vkclient.presentation.comments.CommentScreen
+import com.example.vkclient.presentation.comments.CommentsScreen
 import com.example.vkclient.presentation.news.NewsFeedScreen
-
 
 @Composable
 fun MainScreen() {
@@ -28,21 +28,20 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(
-                backgroundColor = Color.Black,
-                contentColor = Color.Black
-            ) {
+            BottomNavigation {
                 val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-                val currentRout = navBackStackEntry?.destination?.route
+
                 val items = listOf(
                     NavigationItem.Home,
                     NavigationItem.Favourite,
                     NavigationItem.Profile
                 )
                 items.forEach { item ->
+
                     val selected = navBackStackEntry?.destination?.hierarchy?.any {
                         it.route == item.screen.route
                     } ?: false
+
                     BottomNavigationItem(
                         selected = selected,
                         onClick = {
@@ -56,8 +55,8 @@ fun MainScreen() {
                         label = {
                             Text(text = stringResource(id = item.titleResId))
                         },
-                        selectedContentColor = Color.Black,
-                        unselectedContentColor = Color.DarkGray
+                        selectedContentColor = MaterialTheme.colors.onPrimary,
+                        unselectedContentColor = MaterialTheme.colors.onSecondary
                     )
                 }
             }
@@ -65,7 +64,7 @@ fun MainScreen() {
     ) { paddingValues ->
         AppNavGraph(
             navHostController = navigationState.navHostController,
-            newFeedScreenContent = {
+            newsFeedScreenContent = {
                 NewsFeedScreen(
                     paddingValues = paddingValues,
                     onCommentClickListener = {
@@ -73,12 +72,12 @@ fun MainScreen() {
                     }
                 )
             },
-            commentsScreenContent = {feedPost ->
-                CommentScreen(
-                    feedPost = feedPost,
+            commentsScreenContent = { feedPost ->
+                CommentsScreen(
                     onBackPressed = {
                         navigationState.navHostController.popBackStack()
-                    }
+                    },
+                    feedPost = feedPost
                 )
             },
             favouriteScreenContent = { TextCounter(name = "Favourite") },
@@ -93,9 +92,10 @@ private fun TextCounter(name: String) {
         mutableStateOf(0)
     }
 
-    androidx.compose.material.Text(
+    Text(
         modifier = Modifier.clickable { count++ },
         text = "$name Count: $count",
-        color = Color.White
+        color = Color.Black
     )
 }
+
