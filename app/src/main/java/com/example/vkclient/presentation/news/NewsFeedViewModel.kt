@@ -1,59 +1,64 @@
 package com.example.vkclient.presentation.news
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.vkclient.domain.FeedPost
-import com.example.vkclient.domain.StatisticItem
+import androidx.lifecycle.viewModelScope
+import com.example.vkclient.domain.entity.FeedPost
+import com.example.vkclient.domain.usecases.ChangeLikeStatusUseCase
+import com.example.vkclient.domain.usecases.DeletePostUseCase
+import com.example.vkclient.domain.usecases.GetRecommendationsUseCase
+import com.example.vkclient.domain.usecases.LoadNextDataUseCase
+import com.example.vkclient.extensions.mergeWith
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewsFeedViewModel : ViewModel() {
+class NewsFeedViewModel @Inject constructor(
+    private val getRecommendationsUseCase: GetRecommendationsUseCase,
+    private val loadNextDataUseCase: LoadNextDataUseCase,
+    private val changeLikeStatusUseCase: ChangeLikeStatusUseCase,
+    private val deletePostUseCase: DeletePostUseCase,
+) : ViewModel() {
 
-    private val sourceList = mutableListOf<FeedPost>().apply {
-        repeat(10) {
-            add(FeedPost(id = it))
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        Log.d("NewsFeedViewModel", "Exception caught by exception handler")
+    }
+
+    private val recommendationsFlow = getRecommendationsUseCase()
+
+    private val loadNextDataFlow = MutableSharedFlow<NewsFeedScreenState>()
+
+    val screenState = recommendationsFlow
+        .filter { it.isNotEmpty() }
+        .map { NewsFeedScreenState.Posts(posts = it) as NewsFeedScreenState }
+        .onStart { emit(NewsFeedScreenState.Loading) }
+        .mergeWith(loadNextDataFlow)
+
+    fun loadNextRecommendations() {
+        viewModelScope.launch {
+            loadNextDataFlow.emit(
+                NewsFeedScreenState.Posts(
+                    posts = recommendationsFlow.value,
+                    nextDataIsLoading = true
+                )
+            )
+            loadNextDataUseCase()
         }
     }
 
-    private val initialState = NewsFeedScreenState.Posts(posts = sourceList)
-
-    private val _screenState = MutableLiveData<NewsFeedScreenState>(initialState)
-    val screenState: LiveData<NewsFeedScreenState> = _screenState
-
-
-    fun updateCount(feedPost: FeedPost, item: StatisticItem) {
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-        val oldPosts = currentState.posts.toMutableList()
-        val oldStatistics = feedPost.statistics
-        val newStatistics = oldStatistics.toMutableList().apply {
-            replaceAll { oldItem ->
-                if (oldItem.type == item.type) {
-                    oldItem.copy(count = oldItem.count + 1)
-                } else {
-                    oldItem
-                }
-            }
+    fun changeLikeStatus(feedPost: FeedPost) {
+        viewModelScope.launch(exceptionHandler) {
+            changeLikeStatusUseCase(feedPost)
         }
-        val newFeddPost = feedPost.copy(statistics = newStatistics)
-        val newPosts = oldPosts.apply {
-            replaceAll {
-                if (it.id == newFeddPost.id) {
-                    newFeddPost
-                } else {
-                    it
-                }
-            }
-        }
-
-        _screenState.value = NewsFeedScreenState.Posts(posts = newPosts)
     }
 
     fun remove(feedPost: FeedPost) {
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-
-        val oldPosts = currentState.posts.toMutableList()
-        oldPosts.remove(feedPost)
-        _screenState.value = NewsFeedScreenState.Posts(posts = oldPosts)
+        viewModelScope.launch(exceptionHandler) {
+            deletePostUseCase(feedPost)
+        }
     }
 }

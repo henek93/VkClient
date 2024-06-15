@@ -1,9 +1,9 @@
 package com.example.vkclient.presentation.main
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.vkclient.R
 import com.example.vkclient.navigation.Screen
@@ -17,18 +17,18 @@ sealed class NavigationItem(
     object Home : NavigationItem(
         screen = Screen.Home,
         titleResId = R.string.navigation_item_main,
-        icon = Icons.Default.Home
+        icon = Icons.Outlined.Home
     )
 
-    object Favourite: NavigationItem(
+    object Favourite : NavigationItem(
+        screen = Screen.Favourite,
         titleResId = R.string.navigation_item_favourite,
-        icon = Icons.Default.Favorite,
-        screen = Screen.Favourite
+        icon = Icons.Outlined.Favorite
     )
 
-    object Profile: NavigationItem(
+    object Profile : NavigationItem(
+        screen = Screen.Profile,
         titleResId = R.string.navigation_item_profile,
-        icon = Icons.Default.Person,
-        screen = Screen.Profile
+        icon = Icons.Outlined.Person
     )
 }

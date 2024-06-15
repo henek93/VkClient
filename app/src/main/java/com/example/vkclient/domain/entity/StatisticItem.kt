@@ -1,4 +1,4 @@
-package com.example.vkclient.domain
+package com.example.vkclient.domain.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -7,8 +7,8 @@ import kotlinx.parcelize.Parcelize
 data class StatisticItem(
     val type: StatisticType,
     val count: Int = 0
-): Parcelable
+) : Parcelable
 
-enum class StatisticType{
+enum class StatisticType {
     VIEWS, COMMENTS, SHARES, LIKES
 }
